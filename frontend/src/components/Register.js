@@ -94,7 +94,7 @@ const Register = () => {
     setShowModal(true);
     setShowForm(false);
 
-    const response = await fetch("threads/sendotp", {
+    const response = await fetch("https://threads24-mu.vercel.app/threads/sendotp", {
       method: "POST",
       body: JSON.stringify({ email: email }),
       headers: {
@@ -122,7 +122,7 @@ const Register = () => {
       selectedYear,
     };
 
-    const otpVerificationResponse = await fetch("/threads/verifyotp", {
+    const otpVerificationResponse = await fetch("https://threads24-mu.vercel.app/threads/verifyotp", {
       method: "POST",
       body: JSON.stringify({ email: email, otp: otp }),
       headers: {
@@ -137,7 +137,7 @@ const Register = () => {
         details.email.includes("csd@sonatech.ac.in")
       ) {
         console.log("EMail: ", details.email);
-        const registrationResponse = await fetch("/threads/registersona", {
+        const registrationResponse = await fetch("https://threads24-mu.vercel.app/threads/registersona", {
           method: "POST",
           body: JSON.stringify(details),
           headers: {
@@ -198,7 +198,7 @@ const Register = () => {
     const UPI_id = UPI;
     console.log(UPI_id);
 
-    const UPIresponse = await fetch("threads/register", {
+    const UPIresponse = await fetch("https://threads24-mu.vercel.app/threads/register", {
       method: "POST",
       body: JSON.stringify({ details, UPI_id }),
       headers: {

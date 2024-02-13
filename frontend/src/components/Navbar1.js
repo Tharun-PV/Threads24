@@ -16,7 +16,7 @@ export const Navbar1 = () => {
 
     const details = { email };
 
-    const response = await fetch("threads/download", {
+    const response = await fetch("https://threads24-mu.vercel.app/threads/download", {
       method: "POST",
       body: JSON.stringify(details),
       headers: {
