@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 });
 
 // routes
-app.use("https://threads24.onrender.com/threads", detailsRoutes);
+app.use("/threads", detailsRoutes);
 
 // connect to db
 mongoose
