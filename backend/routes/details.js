@@ -8,11 +8,11 @@ const router = express.Router();
 
 router.post("/sendotp", async (req, res) => {
   const otp = Number(Math.floor(Math.random() * 9000) + 1000);
-  console.log(otp);
+  // console.log(otp);
   const { email } = req.body;
   const user = await OTP.findOne({ email });
   if (user) {
-    console.log("updating OTP");
+    // console.log("updating OTP");
     await OTP.updateOne({ email: email }, { $set: { otp: otp } });
 
     let transporter = nodemailer.createTransport({
@@ -27,7 +27,13 @@ router.post("/sendotp", async (req, res) => {
       from: process.env.EMAIL,
       to: req.body.email,
       subject: "OTP verification",
-      html: `<p>your otp is ${otp}</p>`,
+      html: `Hello Participant,<br/></br>
+      Your registration for the college events at Sona College of Technology is in progress. Please use the One Time Password (OTP) below to complete the registration process:</br></br>
+      <b><strong>OTP: ${otp}</strong></b></br></br>
+      For any assistance, feel free to contact us at Sona.cse.sympo@gmail.com.<br/></br>
+      Best regards,<br/>
+      Department of CSE,<br/>
+      Sona College of Technology`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -54,7 +60,13 @@ router.post("/sendotp", async (req, res) => {
       from: process.env.EMAIL,
       to: req.body.email,
       subject: "OTP verification",
-      html: `<p>your otp is ${otp}</p>`,
+      html: `Hello Participant,<br/></br>
+      Your registration for the college events at Sona College of Technology is in progress. Please use the One Time Password (OTP) below to complete the registration process:</br></br>
+      <b><strong>OTP: ${otp}</strong></b></br></br>
+      For any assistance, feel free to contact us at Sona.cse.sympo@gmail.com.<br/></br>
+      Best regards,<br/>
+      Department of CSE,<br/>
+      Sona College of Technology`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -193,9 +205,9 @@ router.post("/registersona", async (req, res) => {
     try {
       // console.log(typeof (user.selectedEvents));
 
-      if (user.selectedEvents == "true") {
+      if (user.selectedWorkshops == "false") {
         if (workshop == "uiux") {
-          if (uiuxc >= 3) {
+          if (uiuxc >= 100) {
             res.json({ msgg: "UIUX workshop is filled", flag: false });
             return;
           }
@@ -243,22 +255,26 @@ router.post("/registersona", async (req, res) => {
           { $set: { selectedWorkshops: selectedWorkshops } }
         );
       }
-      if (user.selectedWorkshops != "false") {
+      if (user.selectedEvents == "false") {
         const mes = await Detail.updateOne(
           { email: email },
           { $set: { selectedEvents: selectedEvents } }
         );
       }
-      if (user.selectedEvents == "false" && user.selectedWorkshops == "false") {
-        const mes = await Detail.updateOne(
-          { email: email },
-          {
-            $set: {
-              selectedEvents: selectedEvents,
-              selectedWorkshops: selectedWorkshops,
-            },
-          }
-        );
+      //
+      // if (user.selectedWorkshops != "false") {
+      //   return res.json({
+      //     msgg: "You have already registerd for workshops",
+      //     flag: false,
+      //   });
+      // }
+      //
+
+      if (user.selectedEvents == "true" && user.selectedWorkshops != "false") {
+        return res.json({
+          msgg: "You have already registerd for both events and workshop",
+          flag: false,
+        });
       }
     } catch (e) {
       console.log(e);
@@ -271,8 +287,8 @@ router.post("/registersona", async (req, res) => {
   } else {
     try {
       if (workshop == "uiux") {
-        if (uiuxc > 5) {
-          console.log("Count exceeded");
+        if (uiuxc > 100) {
+          // console.log("Count exceeded");
 
           return res.json({ msgg: "UIUX workshop is filled", flag: false });
         }
@@ -298,7 +314,7 @@ router.post("/registersona", async (req, res) => {
           { _id: "65c9f395fde61a170c9bff55" },
           { $inc: { web: 1 } }
         );
-      } else {
+      } else if(workshop=='cyber_security'){
         if (cyberc > 100) {
           res.json({ msgg: "Cyber_Security workshop is filled", flag: false });
           return;
@@ -329,7 +345,7 @@ router.post("/registersona", async (req, res) => {
       // res.status(200);
       // res.status(200).json(detail);
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
       res.status(400).json({ error: error.message });
     }
   }
