@@ -42,7 +42,7 @@ router.post("/sendotp", async (req, res) => {
         console.log(error);
       } else {
         console.log("Email sent: ");
-        res.json(otp);
+        //res.json(otp);
       }
     });
     res.status(200);
@@ -75,7 +75,7 @@ router.post("/sendotp", async (req, res) => {
         console.log(error);
       } else {
         console.log("Email sent: ");
-        res.json(otp);
+        //res.json(otp);
       }
     });
   }
