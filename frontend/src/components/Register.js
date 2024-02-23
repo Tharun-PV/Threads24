@@ -22,7 +22,6 @@ const Register = () => {
   const [department, setDepartment] = useState("");
   const [college, setCollege] = useState("");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState(null);
   const [number, setNumber] = useState(null);
   const [showHiddenDiv, setShowHiddenDiv] = useState(false);
   const [showHiddenDiv2, setShowHiddenDiv2] = useState(false);
@@ -45,7 +44,6 @@ const Register = () => {
 
   function revert2(e) {
     setChecked2(!checked2);
-    // console.log(checked2);
     setShowHiddenDiv2(checked2);
   }
 
@@ -91,25 +89,29 @@ const Register = () => {
   };
 
   const sendOTP = async (e) => {
-    setShowModal(true);
-    setShowForm(false);
+    if (selectedEvents == false && checked2 == false) {
+      e.preventDefault();
+      alert("Select atleast one participation");
+    } else {
+      setShowModal(true);
+      setShowForm(false);
 
-    const response = await fetch("https://threads24.onrender.com/threads/sendotp", {
-      method: "POST",
-      body: JSON.stringify({ email: email }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+      const response = await fetch(
+        // "https://threads24.onrender.com/threads/sendotp",
+        "threads/sendotp",
+        {
+          method: "POST",
+          body: JSON.stringify({ email: email }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("OTP sent");
+    }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setShowModal(true);
-    // setShowForm(false)
-
-    // if (selectedCollege == "Others") {
-    //   setSelectedCollege(college);
-    // }
 
     const details = {
       name,
@@ -122,13 +124,17 @@ const Register = () => {
       selectedYear,
     };
 
-    const otpVerificationResponse = await fetch("https://threads24.onrender.com/threads/verifyotp", {
-      method: "POST",
-      body: JSON.stringify({ email: email, otp: otp }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const otpVerificationResponse = await fetch(
+      // "https://threads24.onrender.com/threads/verifyotp",
+      "threads/verifyotp",
+      {
+        method: "POST",
+        body: JSON.stringify({ email: email, otp: otp }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (otpVerificationResponse.status == 200) {
       if (
@@ -137,23 +143,30 @@ const Register = () => {
         details.email.includes("csd@sonatech.ac.in")
       ) {
         console.log("EMail: ", details.email);
-        const registrationResponse = await fetch("https://threads24.onrender.com/threads/registersona", {
-          method: "POST",
-          body: JSON.stringify(details),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const registrationResponse = await fetch(
+          // "https://threads24.onrender.com/threads/registersona",
+          "threads/registersona",
+          {
+            method: "POST",
+            body: JSON.stringify(details),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const responseData = await registrationResponse.json();
         console.log(responseData);
-        // console.log(registrationResponse);
-        if (!responseData.flag) {
-          alert(responseData.msgg);
-        } else {
-          alert(
-            "Successfully registered! You will receive a confirmation mail shortly"
-          );
+        console.log("RESPONSE DATA: ", responseData.mssg);
+        if (responseData) {
+          alert(responseData.mssg);
         }
+        // if (!responseData.flag) {
+        //   alert(responseData.msgg);
+        // } else {
+        //   alert(
+        //     "Successfully registered! You will receive a confirmation mail shortly"
+        //   );
+        // }
         navigate("/");
         // return;
       } else {
@@ -161,28 +174,18 @@ const Register = () => {
         setShowModal(false);
         setShowPage(true);
       }
-      // console.log("OTP VERIFY RESP: ", otpVerificationResponse);
     } else {
       alert("Wrong OTP entered");
     }
-
-    // if (otpVerificationResponse.ok) {
-    //   // console.log(details.selectedWorkshops);
-    //   const registrationResponse = await fetch("https://threads24.onrender.com/threads/register", {
-    //     method: "POST",
-    //     body: JSON.stringify(details),
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   });
-    //   console.log("Resgis response", registrationResponse);
-    //   // }
-    // } else {
-    //   alert("Wrong otp entered");
-    // }
   };
 
   const handleSubmit2 = async (e) => {
+    e.preventDefault();
+
+    if (UPI.length !== 12 || isNaN(UPI)) {
+      alert("You can only enter 12digit transaction ID");
+      return;
+    }
     const details = {
       name,
       selectedCollege,
@@ -198,23 +201,43 @@ const Register = () => {
     const UPI_id = UPI;
     console.log(UPI_id);
 
-    const UPIresponse = await fetch("https://threads24.onrender.com/threads/register", {
-      method: "POST",
-      body: JSON.stringify({ details, UPI_id }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    // console.log(UPIresponse.data.msgg);
-    if (UPIresponse.status == 200) {
-      console.log("hi");
-      alert(
-        "Registered successfully!! You will receive a confirmation mail shortly"
-      );
-      navigate("/");
-    } else {
-      alert("failed");
-    }
+    const UPIresponse = await fetch(
+      // "https://threads24.onrender.com/threads/register",
+      "threads/register",
+      {
+        method: "POST",
+        body: JSON.stringify({ details, UPI_id }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    // .then((res) => res.json())
+    // .then((data) => {
+    //   console.log(data);
+    // });
+    UPIresponse.json()
+      .then((responseJson) => {
+        if (responseJson) {
+          alert(responseJson.mssg);
+          navigate("/");
+        } else {
+          alert("failed");
+        }
+      })
+      .catch((error) => {
+        console.error("Error processing JSON response:", error);
+      });
+    // console.log("UPI RESP");
+    // console.log(UPIresponse);
+    // console.log(UPIresponse.mssg);
+
+    // if (UPIresponse) {
+    //   alert(UPIresponse.mssg);
+    //   navigate("/");
+    // } else {
+    //   alert("failed");
+    // }
   };
 
   return (
@@ -225,18 +248,44 @@ const Register = () => {
 
       {/* OTP page */}
       {showModal && (
-        <div className="modal1">
-          <div className="modal-content2">
-            <span className="close" onClick={handleCloseModal}>
-              &times;
-            </span>
-            <h2>Enter OTP sent to your registered mail id: </h2>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          className="modal1"
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+            }}
+            className="modal-content2"
+          >
+            <h2 style={{ textAlign: "center" }}>
+              Enter OTP sent to your registered mail id:{" "}
+            </h2>
             <input
               type="number"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
             />
-            <button onClick={handleSubmit}>Submit</button>
+            {/* <button onClick={handleSubmit}>Submit</button> */}
+            <a
+              className="register_btn btn2 "
+              onClick={handleSubmit}
+              style={{ cursor: "pointer" }}
+              target="_blank"
+            >
+              <span> </span>
+              <span> </span>
+              <span> </span>
+              <span> </span>
+              Submit
+            </a>
           </div>
         </div>
       )}
@@ -299,7 +348,7 @@ const Register = () => {
                   onClick={handleCollegeChange}
                 />
                 <label htmlFor="others" className="workShopTxt">
-                  Others
+                  Others (Your college name)
                 </label>
                 <br />
               </div>
@@ -332,12 +381,12 @@ const Register = () => {
                   onClick={revert}
                 />
                 <label htmlFor="event" className="workShopTxt">
-                  Event
+                  Events (24.02.2024)
                 </label>
                 <br />
               </div>
 
-              <div className="radioBtn">
+              {/* <div className="radioBtn">
                 <input
                   type="checkbox"
                   id="workshop"
@@ -348,10 +397,10 @@ const Register = () => {
                   onClick={revert2}
                 />
                 <label htmlFor="workshop" className="workShopTxt">
-                  Workshop
+                  Workshop (23.02.2024)
                 </label>
                 <br />
-              </div>
+              </div> */}
 
               <div
                 className="hiddenDiv1"
@@ -504,13 +553,18 @@ const Register = () => {
                 required
                 id="contactNo"
                 className="inputBox"
+                maxLength="10"
+                minLength="10"
                 onChange={(e) => setNumber(e.target.value)}
                 value={number}
               />
               <br />
               <br />
 
-              <label htmlFor="email">Email ID</label>
+              <label htmlFor="email">
+                Email ID (Note: If you are from Sona College, kindly enter your
+                sonatech mail ID)
+              </label>
               <br />
               <input
                 type="email"
@@ -528,7 +582,11 @@ const Register = () => {
               <br />
 
               <br />
-              <button className="submitBtn" id="nextBtn">
+              <button
+                style={{ cursor: "pointer" }}
+                className="submitBtn"
+                id="nextBtn"
+              >
                 NEXT
               </button>
               <br />
@@ -547,19 +605,51 @@ const Register = () => {
                 <p>
                   Scan and pay through the QR Code or take a screenshot of the
                   QR code and upload it in the UPI app to make the payment.
+                  <br />
+                  Or else make UPI payment to: <strong>8270202119</strong>
+                  <br />
+                  Only events: 300rs
+                  <br />
+                  Only Workshop: 200rs
+                  <br />
+                  Both events and Workshops: 500rs
                 </p>{" "}
-                {selectedEvents && !selectedWorkshops && (
-                  <img className="qr" src={eventQR} alt="" />
-                )}
-                {selectedEvents && selectedWorkshops && (
-                  <img className="qr" src={workshopEventsQr} alt="" />
-                )}
-                {!selectedEvents && selectedWorkshops && (
-                  <img className="qr" src={workshopQR} alt="" />
-                )}
+                {/* outside clg, events */}
+                {selectedEvents &&
+                  !selectedWorkshops &&
+                  !email.includes("cse@sonatech.ac.in") &&
+                  !email.includes("aml@sonatech.ac.in") &&
+                  !email.includes("csd@sonatech.ac.in") && (
+                    <img className="qr" src={eventQR} alt="" />
+                  )}
+                {/* outside clg,  workshops events */}
+                {selectedEvents &&
+                  selectedWorkshops &&
+                  !email.includes("cse@sonatech.ac.in") &&
+                  !email.includes("aml@sonatech.ac.in") &&
+                  !email.includes("csd@sonatech.ac.in") && (
+                    <img className="qr" src={workshopEventsQr} alt="" />
+                  )}
+                {/* outside clg, workshops */}
+                {!selectedEvents &&
+                  selectedWorkshops &&
+                  !email.includes("cse@sonatech.ac.in") &&
+                  !email.includes("aml@sonatech.ac.in") &&
+                  !email.includes("csd@sonatech.ac.in") && (
+                    <img className="qr" src={workshopQR} alt="" />
+                  )}
+                {/*  inside clg, workshops */}
+                {selectedWorkshops &&
+                  (email.includes("cse@sonatech.ac.in") ||
+                    email.includes("aml@sonatech.ac.in") ||
+                    email.includes("csd@sonatech.ac.in")) && (
+                    <img className="qr" src={workshopQR} alt="" />
+                  )}
                 <p>Enter your 12 digit transaction ID: </p>
                 <input
                   className="input"
+                  maxLength="12"
+                  minLength="12"
                   type="text"
                   name=""
                   id=""
