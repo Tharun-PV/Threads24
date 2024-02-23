@@ -16,9 +16,7 @@ router.post("/sendotp", async (req, res) => {
     await OTP.updateOne({ email: email }, { $set: { otp: otp } });
 
     let transporter = nodemailer.createTransport({
-      service: "sxb1plzcpnl504408.prod.sxb1.secureserver.net",
-      port: 465,
-      secure: this.trace,
+      service: "gmail",
       auth: {
         user: process.env.EMAIL, // generated ethereal email
         pass: process.env.PASS, // generated ethereal password
@@ -51,9 +49,7 @@ router.post("/sendotp", async (req, res) => {
   } else {
     const detail = await OTP.create({ email, otp });
     let transporter = nodemailer.createTransport({
-      service: "sxb1plzcpnl504408.prod.sxb1.secureserver.net",
-      port: 465,
-      secure: true,
+      service: "gmail",
       auth: {
         user: process.env.EMAIL, // generated ethereal email
         pass: process.env.PASS, // generated ethereal password
